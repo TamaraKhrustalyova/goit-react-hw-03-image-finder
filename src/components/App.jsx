@@ -6,7 +6,7 @@ import {Button} from './Button/Button';
 import { Modal } from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 
-import { getImagesByQuery } from "components/Api/images";
+import { getImagesByQuery } from '../Api/images';
 
 
 export class App extends Component {
@@ -21,20 +21,15 @@ export class App extends Component {
   }
 
   handleFormSubmit = searchItem => {
-    this.setState({query: searchItem})
+    this.setState({query: searchItem, images: [], page: 1})
   }
 
   componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevState.query;
     const newQuery = this.state.query;
-    if(prevQuery !== newQuery)  {
-        this.setState({images: []});
+    if(prevQuery !== newQuery || prevState.page !== this.state.page)  {
         this.handleSearch();
-    }
-    if(prevState.page !== this.state.page){
-      this.handleSearch();
-    }
-}
+}}
 
 handleSearch = async() => {
   const {query, page} = this.state;
@@ -59,13 +54,12 @@ toggleModal = () => {
 
 onImageClick = (largeImageUrl) => {
   this.setState({showModal: true, largeImageUrl})
-
 }
 
-render() {
+render () {
 
     const {images, showBtn, showModal, largeImageUrl, loading} = this.state;
-    
+  
     return (
       <Container>
         <Searchbar onFormSubmit={this.handleFormSubmit}/>
@@ -73,8 +67,7 @@ render() {
         <ImageGallery imagesToRender={images} onImageClick={this.onImageClick}/>
         {showBtn && <Button onClick={this.onButtonClick}/>}
         {showModal && <Modal onClose={this.toggleModal}><img src={largeImageUrl} alt=''></img></Modal>}
-      </Container>
-      
+      </Container> 
     )
   }
 };
