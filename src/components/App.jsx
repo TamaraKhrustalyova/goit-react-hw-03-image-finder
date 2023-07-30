@@ -3,17 +3,21 @@ import {Container} from './App.styled';
 import { Searchbar } from './Searchbar/Searchbar';
 import {ImageGallery} from './ImageGallery/ImageGallery';
 import {Button} from './Button/Button';
+import { Modal } from './Modal/Modal';
+import { Loader } from './Loader/Loader';
 
 import { getImagesByQuery } from "components/Api/images";
+
 
 export class App extends Component {
   state = {
     query: '',
     images: [],
-    loading: false,
     page: 1,
     showBtn: false,
-    
+    showModal: true,
+    loading: false,
+    largeImageUrl: '',
   }
 
   handleFormSubmit = searchItem => {
@@ -33,10 +37,11 @@ export class App extends Component {
 }
 
 handleSearch = async() => {
+  const {query, page} = this.state;
     try{
         this.setState({loading: true}) 
-        const data = await getImagesByQuery(this.state.query, this.state.page)
-        this.setState((prev) => ({images: [...prev.images, ...data.hits], showBtn: this.state.page < (data.totalHits / 12), loading: false}))
+        const data = await getImagesByQuery(query, page)
+        this.setState((prev) => ({images: [...prev.images, ...data.hits], showBtn: page < (data.totalHits / 12), loading: false}))
     } catch {
 
     }
@@ -46,12 +51,28 @@ onButtonClick = () => {
   this.setState((prev) => ({ page: prev.page + 1}))
 }
 
-  render() {
+toggleModal = () => {
+  this.setState(({showModal}) => ({
+    showModal: !showModal,
+  }))
+}
+
+onImageClick = (largeImageUrl) => {
+  this.setState({showModal: true, largeImageUrl})
+
+}
+
+render() {
+
+    const {images, showBtn, showModal, largeImageUrl, loading} = this.state;
+    
     return (
       <Container>
         <Searchbar onFormSubmit={this.handleFormSubmit}/>
-        <ImageGallery imagesToRender={this.state.images}/>
-        <Button onClick={this.onButtonClick}/>
+        {loading && <Loader/>}
+        <ImageGallery imagesToRender={images} onImageClick={this.onImageClick}/>
+        {showBtn && <Button onClick={this.onButtonClick}/>}
+        {showModal && <Modal onClose={this.toggleModal}><img src={largeImageUrl} alt=''></img></Modal>}
       </Container>
       
     )
