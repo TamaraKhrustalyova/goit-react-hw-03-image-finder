@@ -15,7 +15,7 @@ export class App extends Component {
     images: [],
     page: 1,
     showBtn: false,
-    showModal: true,
+    showModal: false,
     loading: false,
     largeImageUrl: '',
   }
